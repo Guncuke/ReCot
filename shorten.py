@@ -7,12 +7,10 @@ from datasets import Dataset
 
 def process_sample(args):
     client, prompt, example, i, max_retries, initial_retry_delay = args
-    print(example.keys())
+
     if 'shorten_reasoning' not in example:
-        print('shorten_reasoning not in example')
         reasoning = example.get('reasoning', '')
     else:
-        print('shorten_reasoning in example')
         reasoning = example.get('shorten_reasoning', '')
     
     # Construct prompt
@@ -54,7 +52,7 @@ def shorten(ds, num_workers=5):
     )
     
     # Define prompt template for shortening reasoning
-    prompt_template = """Please shorten the following reasoning process a little bit. Maintain the core logic and key steps, but make the overall content more concise. Ensure the thought process leads to the right answer. Directly give the shortened result without any additional explanation or context:
+    prompt_template = """Please moderately shorten the following reasoning process. Maintain all core logic, key steps, and essential intermediate calculations. Only remove redundant explanations and repetitive checks. The shortened version should preserve about 80% of the original content and lead to the same answer. Directly give the shortened result without any additional explanation or context:
     Reasoning:
     {reasoning}
     Shortened reasoning:"""
