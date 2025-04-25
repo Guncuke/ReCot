@@ -7,11 +7,11 @@ from typing import List, Dict, Any
 def create_prompt(solution: str, ground_truth: str) -> str:
     return f"""
     You are a judge that evaluates the correctness of a solution.
-    You will be given a proposed solution and a ground truth solution.
-    You will need to determine if the proposed solution is correct.
-    The proposed solution must arrive at the ground truth solution.
+    You will be given a solution and a ground truth solution.
+    You will need to determine if the solution is correct.
+    Answers are in the format of \\boxed{{}}.
 
-    PROPOSED SOLUTION: {solution}
+    SOLUTION: {solution}
     GROUND TRUTH SOLUTION: {ground_truth}
 
     Return your answer directly, True or False.
@@ -20,9 +20,13 @@ def create_prompt(solution: str, ground_truth: str) -> str:
     """
 
 def process_batch(examples: Dict[str, List[Any]]) -> Dict[str, List[bool]]:
+    # client = OpenAI(
+    #     api_key="sk-c0010e3aa3014e97a9bed2191795480a", 
+    #     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    # )
     client = OpenAI(
-        api_key="sk-ad80c93f1b014a8fbc3997dc2e157293", 
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        api_key="JcUSnxQgmlWodneR2Owapxi7MwIwHImX", 
+        base_url="http://api.chatrhino.jd.com/api/v1/chat/completions",
     )
     
     results = []
@@ -34,7 +38,7 @@ def process_batch(examples: Dict[str, List[Any]]) -> Dict[str, List[bool]]:
         formatted_prompt = create_prompt(solution, ground_truth)
         
         response = client.chat.completions.create(
-            model="qwen-plus",
+            model="Chatrhino-81B-Pro",
             temperature=0.1,
             top_p=0.8,
             messages=[
@@ -56,10 +60,10 @@ def math_judge(ds: Dataset) -> Dataset:
         if col not in ds.column_names:
             raise ValueError(f"数据集缺少必要的列: {col}")
     
-
     return ds.map(
         process_batch,
         batched=True,
         batch_size=8,
+        num_proc=8,
         desc="math judge"
     )

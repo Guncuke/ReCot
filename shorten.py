@@ -43,9 +43,9 @@ def process_sample(args):
                 return i, reasoning
 
 
-def shorten(ds: Dataset, num_workers: int = 10):
+def shorten(ds: Dataset, num_workers: int = 32):
     client = OpenAI(
-        api_key="sk-ad80c93f1b014a8fbc3997dc2e157293", 
+        api_key="sk-c0010e3aa3014e97a9bed2191795480a", 
         base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
     

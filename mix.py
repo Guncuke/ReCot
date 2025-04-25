@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     verified_mix_ds = []
  
-    for subset in ["math", "puzzle", "code"]:
+    for subset in ["puzzle", "math", "code"]:
         ds = load_dataset('json', data_files=f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_data.jsonl", split='train')
         verified_ds, falsed_ds = verify(ds)
 

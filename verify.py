@@ -9,7 +9,7 @@ def verify(ds: Dataset):
     if ds["domain"][0] == "math":
         ds = math_judge(ds)
     elif ds["domain"][0] == "puzzle":
-        ds = math_judge(ds)
+        ds = puzzle_judge(ds)
     elif ds["domain"][0] == "code":
         ds = code_judge(ds)
     else:
