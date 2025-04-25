@@ -26,7 +26,7 @@ def process_batch(examples: Dict[str, List[Any]]) -> Dict[str, List[bool]]:
     # )
     client = OpenAI(
         api_key="JcUSnxQgmlWodneR2Owapxi7MwIwHImX", 
-        base_url="http://api.chatrhino.jd.com/api/v1/chat/completions",
+        base_url="http://inferential-api-service-apipre.omniforce.svc.lf06.n.jd.local/v1",
     )
     
     results = []
