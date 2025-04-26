@@ -39,8 +39,9 @@ if __name__ == "__main__":
             right_ds.to_json(f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_shorten_iter{iter}_data.jsonl", orient="records", lines=True)
 
             if len(wrong_ds) > 0:
-                all_wrong_ds.append(wrong_ds)
+                wrong_ds = wrong_ds.map(lambda example: {'shorten_reasoning': example['reasoning']})
                 wrong_ds.to_json(f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_wrong_iter{iter}_data.jsonl", orient="records", lines=True)
+                all_wrong_ds.append(wrong_ds)
         
         print(f"finish iteration {iter}")
 
