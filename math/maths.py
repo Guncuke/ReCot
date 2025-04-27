@@ -21,7 +21,7 @@ if __name__ == "__main__":
     ds = ds.add_column("source", ["numina_math"] * len(ds))
 
     if args.dry_run:
-        ds = ds.take(9000)
+        ds = ds.take(12000)
 
     ds = deduplicate(ds)
     ds = decontaminate(ds)

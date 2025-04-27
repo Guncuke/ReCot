@@ -14,9 +14,15 @@ if __name__ == "__main__":
     for iter in range(8, iteration):
         print(f"start iteration {iter}")
         for subset in ["math", "puzzle", "code"]:
+            # original_reasoning: 记录最原始的reasoning
+            # reasoning: 保存当前iter原来的reasoning
+            # shorten_reasoning: 保存当前iter缩短后的reasoning
             # 第一个iter，读取原始数据
             if iter == 0:
                 ds = load_dataset('json', data_files=f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_verified_data.jsonl", split='train')
+                # 添加original_reasoning字段
+                ds = ds.map(lambda example: {'original_reasoning': example['reasoning']})
+                ds = ds.map(lambda example: {"original_deepseek_solution": example['deepseek_solution']})
             # 最后一个iter，读取上一个iter的数据，新的reasnoning内直接删除思考过程
             elif iter == iteration - 1:
                 ds = load_dataset('json', data_files=f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_shorten_iter{iter-1}_data.jsonl", split='train')
@@ -40,6 +46,7 @@ if __name__ == "__main__":
 
             if len(wrong_ds) > 0:
                 wrong_ds = wrong_ds.map(lambda example: {'shorten_reasoning': example['reasoning']})
+                wrong_ds = wrong_ds.map(lambda example: {'deepseek_solution': example['previous_deepseek_solution']})
                 wrong_ds.to_json(f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_wrong_iter{iter}_data.jsonl", orient="records", lines=True)
                 all_wrong_ds.append(wrong_ds)
         

@@ -1,9 +1,6 @@
 import os
-
 from bespokelabs import curator
-
 from open_thoughts.prompt import DEEPSEEK_R1_SYSTEM_PROMPT, format_code_prompt
-from open_thoughts.reason import mocked_reasoner
 
 
 class Reasoner(curator.LLM):
@@ -26,8 +23,6 @@ class Reasoner(curator.LLM):
 
 
 def reason(ds):
-    if os.environ.get("MOCK_REASON"):
-        return mocked_reasoner(ds)
     reasoner = Reasoner( 
         model_name="/public/data0/NLP/users/wucanhui.volcano/models/DeepSeek-R1-Distill-Qwen-7B", 
         backend="vllm",
@@ -43,4 +38,4 @@ def reason(ds):
         }
     )
     return reasoner(ds)
-        
+

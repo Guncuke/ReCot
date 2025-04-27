@@ -1,9 +1,6 @@
 import os
-
 from bespokelabs import curator
-
 from open_thoughts import prompt
-from open_thoughts.reason import mocked_reasoner
 
 
 class Reasoner(curator.LLM):

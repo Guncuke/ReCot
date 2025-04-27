@@ -9,7 +9,7 @@ MODEL_NAME=DeepSeek-R1-Distill-Qwen-7B
 MODEL=/public/data0/NLP/users/wucanhui.volcano/models/$MODEL_NAME
 MODEL_ARGS="pretrained=$MODEL,dtype=float16,max_model_length=32768,gpu_memory_utilization=0.9,tensor_parallel_size=1,generation_parameters={max_tokens:32768,temperature:0.6,top_p:0.95,stop_token_ids:[151643]}"
 
-OUTPUT_DIR=/public/data0/NLP/users/wucanhui.volcano/lighteval/output/$MODEL
+OUTPUT_DIR=/public/data0/NLP/users/wucanhui.volcano/lighteval/output/$MODEL_NAME
 
 # AIME 2024任务设置
 TASK="custom|aime24|0|0"

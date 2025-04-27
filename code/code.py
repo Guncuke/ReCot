@@ -57,7 +57,7 @@ if __name__ == "__main__":
             if subset == "/public/data0/NLP/users/wucanhui.volcano/datasets/all_self_gen_data/code_data/datasets--MatrixStudio--Codeforces-Python-Submissions":
                 subsets[subset] = ds.take(900)
             else:
-                subsets[subset] = ds.take(3500)
+                subsets[subset] = ds.take(3000)
         else:
             subsets[subset] = ds
 

@@ -30,5 +30,5 @@ def boost(ds: Dataset, llm: LLM) -> Dataset:
     boosted_answers = [output.outputs[0].text.strip() for output in outputs]
     
     # 更新数据集
-    ds = ds.map(lambda example: {"original_deepseek_solution": example.get("deepseek_solution", "")})
+    ds = ds.map(lambda example: {"previous_deepseek_solution": example.get("deepseek_solution", "")})
     return ds.map(lambda example, idx: {"deepseek_solution": boosted_answers[idx]}, with_indices=True)
