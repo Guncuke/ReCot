@@ -1,7 +1,9 @@
 import os
+import time
 from openai import OpenAI
 from datasets import Dataset
 from typing import List, Dict, Any
+
 
 
 def create_prompt(solution: str, ground_truth: str) -> str:
@@ -34,21 +36,31 @@ def process_batch(examples: Dict[str, List[Any]]) -> Dict[str, List[bool]]:
     for i in range(len(examples["deepseek_solution"])):
         solution = examples["deepseek_solution"][i]
         ground_truth = examples["solution"][i]
-        
         formatted_prompt = create_prompt(solution, ground_truth)
         
-        response = client.chat.completions.create(
-            model="Chatrhino-81B-Pro",
-            temperature=0.1,
-            top_p=0.8,
-            messages=[
-                {"role": "user", "content": formatted_prompt}
-            ],
-            stream=False
-        )
+        max_retries = 3  # 最大重试次数
+        retry_delay = 1   # 初始延迟秒数
+        correct = False
         
-        response_text = response.choices[0].message.content.strip()
-        correct = response_text == "True"
+        for attempt in range(max_retries):
+            try:
+                response = client.chat.completions.create(
+                    model="Chatrhino-81B-Pro",
+                    temperature=0.1,
+                    top_p=0.8,
+                    messages=[{"role": "user", "content": formatted_prompt}],
+                    stream=False
+                )
+                response_text = response.choices[0].message.content.strip()
+                correct = response_text == "True"
+                break
+                
+            except Exception as e:
+                print(f"异常（尝试 {attempt+1}/{max_retries}）: {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (2 ** attempt))
+                continue
+        
         results.append(correct)
     
     return {"correct": results}

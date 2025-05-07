@@ -20,7 +20,7 @@ def process_sample(args):
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
-                model="qwen-plus",
+                model="Chatrhino-81B-Pro",
                 temperature=0.1,
                 top_p=0.8,
                 messages=[
@@ -44,13 +44,17 @@ def process_sample(args):
 
 
 def shorten(ds: Dataset, num_workers: int = 32):
+    # client = OpenAI(
+    #     api_key="sk-c0010e3aa3014e97a9bed2191795480a", 
+    #     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    # )
     client = OpenAI(
-        api_key="sk-c0010e3aa3014e97a9bed2191795480a", 
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        api_key="JcUSnxQgmlWodneR2Owapxi7MwIwHImX", 
+        base_url="http://inferential-api-service-apipre.omniforce.svc.lf06.n.jd.local/v1",
     )
     
     # Define prompt template for shortening reasoning
-    prompt_template = """Please moderately shorten the following reasoning process. Maintain all core logic, key steps, and essential intermediate calculations. Only remove redundant explanations and repetitive checks. The shortened version should preserve about 80% of the original content and lead to the same answer. Directly give the shortened result without any additional explanation or context:
+    prompt_template = """Please moderately shorten the following reasoning process. Maintain all core logic, key steps, and essential intermediate calculations. Only remove redundant explanations and repetitive checks. The shortened version should preserve about 80% of the original content and lead to the same answer. Directly give the shortened reasoning without any additional explanation or context:
     Reasoning:
     {reasoning}
     Shortened reasoning:"""

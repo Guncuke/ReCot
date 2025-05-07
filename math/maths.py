@@ -21,7 +21,7 @@ if __name__ == "__main__":
     ds = ds.add_column("source", ["numina_math"] * len(ds))
 
     if args.dry_run:
-        ds = ds.take(12000)
+        ds = ds
 
     ds = deduplicate(ds)
     ds = decontaminate(ds)
@@ -33,4 +33,4 @@ if __name__ == "__main__":
         print(ds[0])
         print("================")
 
-    ds.to_json("/public/data0/NLP/users/wucanhui.volcano/output/math_data.jsonl", orient="records", lines=True)
+    ds.to_json("/public/data0/NLP/users/wucanhui.volcano/output_yx/math_data.jsonl", orient="records", lines=True)

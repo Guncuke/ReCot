@@ -1,6 +1,6 @@
 import json
 import os
-from open_thoughts.prompt import DEEPSEEK_R1_SYSTEM_PROMPT, format_code_prompt
+from open_thoughts.prompt import format_code_prompt
 
 
 # 获取脚本所在的目录作为基础路径
@@ -10,7 +10,7 @@ output_dir = base_dir
 # 如果输出目录不存在，则创建它
 os.makedirs(output_dir, exist_ok=True)
 
-data_name = ["code", "math", "puzzle"]
+data_name = ["code", "math"]
 
 def merge_data_files():
     all_data = [] # 将 all_data 移到循环外部
@@ -18,8 +18,8 @@ def merge_data_files():
     for name in data_name:
         current_type_data_count = 0 # 用于跟踪当前类型添加的数据量
         
-        # 读取 {}_shorten_iter8_data.jsonl 文件
-        shorten_file_name = f"{name}_shorten_iter8_data.jsonl"
+        type_count = 0
+        shorten_file_name = f"{name}_shorten_iter5_data.jsonl"
         shorten_file_path = os.path.join(base_dir, shorten_file_name) # 使用绝对路径
         if os.path.exists(shorten_file_path):
             count_before = len(all_data)
@@ -28,9 +28,10 @@ def merge_data_files():
                     for line in f:
                         if line.strip():
                             item = json.loads(line.strip())
-                            # 转换为所需的消息格式
-                            formatted_item = format_item_to_messages(item, name)
+                            # 转换为所需的消息格式，并设置 system content
+                            formatted_item = format_item_to_messages(item, name, system_content="")
                             all_data.append(formatted_item)
+                            type_count += 1
                 loaded_count = len(all_data) - count_before
                 current_type_data_count += loaded_count
                 print(f"从 {shorten_file_path} 加载了 {loaded_count} 条数据")
@@ -41,8 +42,8 @@ def merge_data_files():
         else:
             print(f"警告: {shorten_file_path} 不存在")
         
-        # 读取 iter0~8 的 {}_wrong_itern_data.jsonl 文件 (注意文件扩展名)
-        for i in range(9):  # 0 到 8
+        # 读取 iter0~6 的 {}_wrong_itern_data.jsonl 文件 (注意文件扩展名)
+        for i in range(6):  # 0 到 5
             wrong_file_name = f"{name}_wrong_iter{i}_data.jsonl"
             wrong_file_path = os.path.join(base_dir, wrong_file_name) # 使用绝对路径
             if os.path.exists(wrong_file_path):
@@ -55,12 +56,11 @@ def merge_data_files():
                             if line.strip():
                                 try:
                                     data_item = json.loads(line.strip())
-                                    data_item['shorten_reasoning'] = data_item['reasoning']
-                                    data_item['deepseek_solution'] = data_item['original_deepseek_solution']
-                                    # 转换为所需的消息格式
-                                    formatted_item = format_item_to_messages(data_item, name)
+                                    # 转换为所需的消息格式，并设置 system content
+                                    formatted_item = format_item_to_messages(data_item, name, system_content="")
                                     all_data.append(formatted_item)
                                     added_count_in_file += 1
+                                    type_count += 1
                                 except json.JSONDecodeError as e:
                                     print(f"错误: 解析 {wrong_file_path} 第 {line_num} 行时出错 - {e}")
                                     print(f"问题行内容: {line.strip()}")
@@ -72,10 +72,35 @@ def merge_data_files():
             else:
                 print(f"警告: {wrong_file_path} 不存在")
         
-        print(f"处理完 {name} 类型，共添加 {current_type_data_count} 条数据")
+        print(f"从 {name} 类型的文件中加载了 {type_count} 条数据")
+        
+        # 读取 {}_verified_data.jsonl 文件
+        # verified_file_name = f"{name}_verified_data.jsonl"
+        # verified_file_path = os.path.join(base_dir, verified_file_name) # 使用绝对路径
+        # if os.path.exists(verified_file_path):
+        #     count_before = len(all_data)
+        #     try:
+        #         with open(verified_file_path, 'r', encoding='utf-8') as f:
+        #             for line in f:
+        #                 if line.strip():
+        #                     item = json.loads(line.strip())
+        #                     # 转换为所需的消息格式，verified 数据的 system_content 为空
+        #                     formatted_item = format_item_to_messages(item, name, system_content="")
+        #                     all_data.append(formatted_item)
+        #         loaded_count = len(all_data) - count_before
+        #         current_type_data_count += loaded_count
+        #         print(f"从 {verified_file_path} 加载了 {loaded_count} 条数据")
+        #     except json.JSONDecodeError as e:
+        #         print(f"错误: 解析 {verified_file_path} 时出错 - {e}")
+        #     except Exception as e:
+        #         print(f"错误: 读取 {verified_file_path} 时发生未知错误 - {e}")
+        # else:
+        #     print(f"警告: {verified_file_path} 不存在")
+        
+        # print(f"处理完 {name} 类型，共添加 {current_type_data_count} 条数据")
 
     # 将所有合并后的数据写入一个总的 jsonl 文件
-    output_file_name = "all_merged_data.jsonl" # 定义总输出文件名
+    output_file_name = "all_merged_data_iter5_no_puzzle.jsonl" # 定义总输出文件名
     output_file_path = os.path.join(output_dir, output_file_name) # 使用绝对路径
     try:
         with open(output_file_path, 'w', encoding='utf-8') as f:
@@ -88,15 +113,21 @@ def merge_data_files():
         print(f"错误: 写入输出文件 {output_file_path} 时出错 - {e}")
 
 
-def format_item_to_messages(item, domain):
+def format_item_to_messages(item, domain, system_content=""):
     """
     将数据项转换为消息格式
     {"messages": [{"role": "system", "content": "<system>"}, 
                  {"role": "user", "content": "<query1>"}, 
-                 {"role": "assistant", "content": "<response1>"}]}
+                 {"role": "assistant", "content": "<response1>"}],
+     "compression_ratio": <float>}
+    
+    参数:
+    - item: 数据项
+    - domain: 领域类型 (puzzle, math, code)
+    - system_content: 系统消息内容，默认为空字符串
     """
     # 系统消息
-    system_message = {"role": "system", "content": DEEPSEEK_R1_SYSTEM_PROMPT}
+    system_message = {"role": "system", "content": system_content}
     
     # 用户消息
     user_content = ""
@@ -112,12 +143,13 @@ def format_item_to_messages(item, domain):
     # 助手消息
     reasoning = item.get('shorten_reasoning', '')
     solution = item.get('deepseek_solution', '')
-    assistant_content = f"<think>\n{reasoning}\n</think>{solution}"
+    assistant_content = f"<think>\n{reasoning}\n</think>\n{solution}"
     assistant_message = {"role": "assistant", "content": assistant_content}
     
     # 组合消息
     formatted_data = {
-        "messages": [system_message, user_message, assistant_message]
+        "messages": [system_message, user_message, assistant_message],
+        "compression_ratio": item.get('compression_ratio', 0.0)  # 直接从item中获取compression_ratio字段
     }
     
     return formatted_data

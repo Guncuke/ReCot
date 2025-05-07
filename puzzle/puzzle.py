@@ -43,4 +43,4 @@ if __name__ == "__main__":
         print(ds[0])
         print("================")
 
-    ds.to_json("/public/data0/NLP/users/wucanhui.volcano/output/puzzle_data.jsonl", orient="records", lines=True)
+    ds.to_json("/public/data0/NLP/users/wucanhui.volcano/output_yx/puzzle_data.jsonl", orient="records", lines=True)

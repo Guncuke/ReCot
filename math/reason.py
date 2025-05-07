@@ -35,7 +35,7 @@ def reason(ds):
         },
         backend_params={ 
             "tensor_parallel_size": 4, # Adjust based on GPU count 
-            "gpu_memory_utilization": 0.7,
+            "gpu_memory_utilization": 0.9,
             "require_all_responses" : False,
             "max_model_length": 16384,
             "max_tokens": 16384,

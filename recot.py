@@ -8,10 +8,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 if __name__ == "__main__":
 
-    iteration = 9
+    iteration = 7
     llm = LLM(model="/public/data0/NLP/users/wucanhui.volcano/models/DeepSeek-R1-Distill-Qwen-7B", tensor_parallel_size=4)
     all_wrong_ds = []
-    for iter in range(8, iteration):
+    for iter in range(iteration):
         print(f"start iteration {iter}")
         for subset in ["math", "puzzle", "code"]:
             # original_reasoning: 记录最原始的reasoning
@@ -42,13 +42,22 @@ if __name__ == "__main__":
             right_ds, wrong_ds = verify(ds)
             print(f"Right answer: {len(right_ds)}, Wrong answer: {len(wrong_ds)}")
             print(f"finish for {subset}")
+
+            def calculate_compression_ratio(example):
+                original_len = len(example['original_reasoning'])
+                shortened_len = len(example['shorten_reasoning'])
+                compression_ratio = shortened_len / original_len
+                return {'compression_ratio': compression_ratio}
+            
+            right_ds = right_ds.map(calculate_compression_ratio)
+            # 计算压缩比
             right_ds.to_json(f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_shorten_iter{iter}_data.jsonl", orient="records", lines=True)
 
-            if len(wrong_ds) > 0:
-                wrong_ds = wrong_ds.map(lambda example: {'shorten_reasoning': example['reasoning']})
-                wrong_ds = wrong_ds.map(lambda example: {'deepseek_solution': example['previous_deepseek_solution']})
-                wrong_ds.to_json(f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_wrong_iter{iter}_data.jsonl", orient="records", lines=True)
-                all_wrong_ds.append(wrong_ds)
+            wrong_ds = wrong_ds.map(lambda example: {'shorten_reasoning': example['reasoning']})
+            wrong_ds = wrong_ds.map(lambda example: {'deepseek_solution': example['previous_deepseek_solution']})
+            wrong_ds = wrong_ds.map(calculate_compression_ratio)
+            wrong_ds.to_json(f"/public/data0/NLP/users/wucanhui.volcano/output/{subset}_wrong_iter{iter}_data.jsonl", orient="records", lines=True)
+            all_wrong_ds.append(wrong_ds)
         
         print(f"finish iteration {iter}")
 

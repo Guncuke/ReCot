@@ -309,9 +309,6 @@ def standardize(dataset_name_or_path: str, num_hf_proc_workers: int = 1, dry_run
         trust_remote_code=True,
     )
 
-    if dry_run:
-        dataset = dataset.take(5000)
-
     process_fn_map = {
         "datasets--deepmind--code_contests": codecontests_process,
         "datasets--codeparrot--apps": apps_process,

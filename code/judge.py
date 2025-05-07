@@ -699,7 +699,7 @@ def run_test_with_timeout(problem, generation):
     """Run the test with a timeout."""
     try:
         result = run_test(problem, test=generation, debug=False)
-        return bool(result and np.all(result))
+        return bool(result and all(r == 1 for r in result))
     except Exception as e:
         print(f"Exception in run_test_with_timeout: {e}")
         return False

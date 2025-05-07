@@ -54,10 +54,7 @@ if __name__ == "__main__":
         ds = ds.add_column("subset", [subset] * len(ds))
 
         if args.dry_run:
-            if subset == "/public/data0/NLP/users/wucanhui.volcano/datasets/all_self_gen_data/code_data/datasets--MatrixStudio--Codeforces-Python-Submissions":
-                subsets[subset] = ds.take(900)
-            else:
-                subsets[subset] = ds.take(3000)
+            subsets[subset] = ds
         else:
             subsets[subset] = ds
 
@@ -76,4 +73,4 @@ if __name__ == "__main__":
         print("================")
 
     ds = ds.add_column("domain", ["code"] * len(ds))
-    ds.to_json("/public/data0/NLP/users/wucanhui.volcano/output/code_data.jsonl", orient="records", lines=True)
+    ds.to_json("/public/data0/NLP/users/wucanhui.volcano/output_yx/code_data.jsonl", orient="records", lines=True)
